@@ -22,12 +22,14 @@ class ExtractClinicalCase:
         for el in remove_el:
             data.remove(el)
         
-        clinical_data = {'case_id': '',
-                        'tumor_stage': '',
-                        'prior_malignancy': '',
+        clinical_data = {'case_id': None,
+                        'tumor_stage': None,
+                        'prior_malignancy': None,
                         'age_at_diagnosis': None,
-                        'morphology': '',
-                        'label': ''}
+                        'morphology': None,
+                        'cigarettes_per_day': None,
+                        'label': ''
+                    }
 
         self.df = pd.DataFrame(data=[], columns=clinical_data.keys())
 
@@ -40,7 +42,10 @@ class ExtractClinicalCase:
                 clinical_data['age_at_diagnosis'] = self.__truncate__(value)
 
             clinical_data['morphology'] = el['diagnoses'][0]['morphology']
-
+            if el['exposures'][0]['cigarettes_per_day'] is not None:
+                value = int(el['exposures'][0]['cigarettes_per_day'])
+                clinical_data['cigarettes_per_day'] = value
+            
             self.df = self.df.append(pd.DataFrame(clinical_data, index=[i]), ignore_index=True)
         
     def get_df_clinical_case(self):
@@ -53,4 +58,3 @@ class ExtractClinicalCase:
         multiplier = 10 ** decimals
         return int(n * multiplier) / multiplier
                 
-
