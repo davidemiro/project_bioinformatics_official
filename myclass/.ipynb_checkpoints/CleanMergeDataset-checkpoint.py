@@ -6,19 +6,24 @@ import platform
 
 class Clean_Merge_Dataset:
 	def __init__(self, name=''):
-		
+		self.path_to_final = './data-ready/final_dataset_'+name+'.pkl'
+		if platform.system() == 'Windows':
+			self.path_to_final = self.path_to_final.replace('/','\\')
 		return
 
 	def fit(self, X, y=None):
 		return self
 		
 	def transform(self, data_normal, data_tumor, X=None, y=None):
-		
+		print('Data_normal:', data_normal.shape)
+		print('Data_tumor:', data_tumor.shape)
+
 		dataset = pd.concat([data_tumor, data_normal], ignore_index=True)
+		print('All data:', dataset.shape)
 		
 		# removing TCGA-MESO label items
 		dataset = dataset[dataset['label'] != 'TCGA-MESO']
-		
+		print(set(dataset['label']))
 		
 		# union target with label
 		for index, element in dataset.iterrows():
@@ -42,7 +47,7 @@ class Clean_Merge_Dataset:
 				index_to_delete.append(i)
 			
 		dataset.drop(dataset.columns[index_to_delete], inplace=True, axis=1) # delete 0-values features
-		
+		print('Features completly 0 values', sum_count, 'removed')
 
 		# counting Nan values
 		sum_count = 0
@@ -53,8 +58,10 @@ class Clean_Merge_Dataset:
 				index_to_delete.append(i)
 
 		dataset.dropna(inplace=True, axis=1)
+		print('Features completely Nan', sum_count, 'removed')
 		
-		
+		print('Final dataset shape', dataset.shape)
+		dataset.to_pickle(self.path_to_final)
 		
 		del data_normal
 		del data_tumor

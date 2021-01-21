@@ -79,7 +79,7 @@ class Bonferroni_Ttest():
 		index_to_delete = list(index_to_delete)      
 		X_.drop(X_.columns[index_to_delete], axis=1, inplace=True)
 
-		
+		print('Final dataset shape:', X_.shape)
 		
 		if self.condition is True:
 			return pd.concat([X_, X.loc[:, ['label', 'case_id']]], axis=1), y

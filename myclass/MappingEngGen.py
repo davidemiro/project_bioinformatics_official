@@ -14,12 +14,6 @@ R_SEMICOLON = re.compile(r'\s*;\s*')
 R_COMMA     = re.compile(r'\s*,\s*')
 R_KEYVALUE  = re.compile(r'(\s+|\s*=\s*)')
 
-"""
-	Class to map the ENG.
-	The source function to read and manage the .GTF file is taken from the following repository:
-		https://gist.github.com/slowkow/8101481
-"""
-
 class MappingENG:
 
 	def dataframe_gtf(self, filename):
@@ -77,9 +71,6 @@ class MappingENG:
 		else:
 			return self.X
 
-	def fit_transform(self, X, y=None):
-		return self.fit(X, y).transform(X, y)
-
 	def lines(self, filename):
 		# Open an optionally gzipped GTF file and generate a dict for each line.
 		fn_open = gzip.open if filename.endswith('.gz') else open
@@ -89,7 +80,7 @@ class MappingENG:
 				if line.startswith('#'):
 					continue
 				else:
-					yield self.parse(line)
+					yield parse(line)
 
 
 	def parse(self, line):
@@ -99,7 +90,7 @@ class MappingENG:
 		fields = line.rstrip().split('\t')
 
 		for i, col in enumerate(GTF_HEADER):
-			result[col] = self._get_value(fields[i])
+			result[col] = _get_value(fields[i])
 
 		# INFO field consists of "key1=value;key2=value;...".
 		infos = [x for x in re.split(R_SEMICOLON, fields[8]) if x.strip()]
@@ -114,7 +105,7 @@ class MappingENG:
 				value = info
 			# Ignore the field if there is no value.
 			if value:
-				result[key] = self._get_value(value)
+				result[key] = _get_value(value)
 
 		return result
 
